@@ -1,0 +1,16 @@
+{
+    "scripts": {
+        "predeploydev": "rm -rf node_modules && npm install --platform=linux --arch=arm64",
+        "deploydev": "serverless deploy --stage dev -v",
+        "postdeploydev": "rm -rf node_modules && npm install",
+        "predeployhml": "rm -rf node_modules && npm install --platform=linux --arch=arm64",
+        "deployhml": "serverless deploy --stage hml -v",
+        "postdeployhml": "rm -rf node_modules && npm install",
+        "predeployprd": "rm -rf node_modules && npm install --platform=linux --arch=arm64",
+        "deployprd": "serverless deploy --stage prd -v",
+        "postdeployprd": "rm -rf node_modules && npm install"
+    },
+    "dependencies": {
+        "jsonwebtoken": "9.0.1"
+    }
+}

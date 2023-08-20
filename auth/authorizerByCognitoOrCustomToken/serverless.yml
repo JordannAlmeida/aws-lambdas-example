@@ -1,0 +1,68 @@
+service: authorizerByCognitoOrCustomToken
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  environment:
+    stageEnv: ${self:custom.stage}
+    ACCOUNT_NUMBER: ${self:custom.account.${self:custom.stage}}
+    COGNITO_ARN: ${self:custom.cognitoArn.${self:custom.stage}}
+    NAME_API_GATEWAY: ${self:custom.apiGatewayName.${self:custom.stage}}
+    COGNITO_USER_POOL: ${self:custom.cognitoUserPool.${self:custom.stage}}
+    SECRET_KEY_JWT: ${self:custom.secret.SECRET_KEY_JWT}
+  runtime: nodejs16.x
+  architecture: arm64
+  lambdaHashingVersion: 20201221
+  stage: ${self:custom.stage}
+  region: 'us-east-1'
+  memorySize: 256
+  timeout: 15
+  iam:
+    role:
+      name: 'authorizerByCognitoOrCustomTokenLambdaRole'
+      statements: 
+      - Effect: Allow
+        Action:
+        - cognito-idp:DescribeUserPoolClient
+        Resource: 
+        - "${self:custom.cognitoArn.${self:custom.stage}}"
+      - Effect: Allow
+        Action:
+          - kms:*
+        Resource: 
+          - "arn:aws:kms:sa-east-1:${self:custom.account.${self:custom.stage}}:key/*"
+      - Effect: Allow
+        Action:
+          - ssm:DescribeParameters
+          - ssm:GetParameter
+          - ssm:GetParameters
+        Resource: 
+          - "*"
+
+custom:
+  stage: ${opt:stage, 'dev'}
+  account:
+    prd: ''
+    hml: ''
+    dev: ''
+  cognitoUserPool:
+    dev: '???'
+    hml: '???'
+    prd: '???'
+  cognitoArn:
+    dev: 'arn:aws:cognito-idp:us-east-1:${self:custom.account.${self:custom.stage}}:userpool/${self:custom.cognitoUserPool.${self:custom.stage}}'
+    hml: 'arn:aws:cognito-idp:us-east-1:${self:custom.account.${self:custom.stage}}:userpool/${self:custom.cognitoUserPool.${self:custom.stage}}'
+    prd: 'arn:aws:cognito-idp:us-east-1:${self:custom.account.${self:custom.stage}}:userpool/${self:custom.cognitoUserPool.${self:custom.stage}}'
+  apiGatewayName:
+    dev: '???'
+    hml: '???'
+    prd: '???'
+  secretManagerName:
+    dev: '???'
+    hml: '???'
+    prd: '???'
+  secret: ${ssm(us-east-1):/aws/reference/secretsmanager/${self:custom.secretManagerName.${self:custom.stage}}}
+
+functions:
+  event:
+    handler: event.handler
