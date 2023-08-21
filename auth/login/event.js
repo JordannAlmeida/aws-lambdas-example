@@ -36,6 +36,7 @@ module.exports.handler = async (event, context) => {
             statusCode: 200,
             body: JSON.stringify({
                 access_token: tokenData.acess_token,
+                type: 'Bearer',
                 expiresIn: tokenData.expiresIn
             })
         };
